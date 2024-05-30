@@ -3,6 +3,7 @@ package com.alivold.util;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
 import com.alivold.config.MinioConfig;
+import com.alivold.exception.BaseException;
 import io.minio.*;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
@@ -194,6 +195,7 @@ public class MinioUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new BaseException();
         }
     }
 }

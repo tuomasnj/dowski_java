@@ -3,12 +3,12 @@ package com.alivold;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alivold.config.MinioConfig;
+import com.alivold.service.EmailService;
 import com.alivold.util.MinioUtil;
 import io.minio.MinioClient;
 import io.minio.messages.Bucket;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +32,9 @@ public class TestClass {
 
     @Autowired
     private MinioUtil minioUtil;
+
+    @Autowired
+    private EmailService emailService;
 
     @Test
     public void test1(){
@@ -80,5 +83,16 @@ public class TestClass {
     public void testBucketInfo(){
         List<Item> items = minioUtil.listObjects();
         System.out.println(items);
+    }
+
+    @Test
+    public void testBaseEmail(){
+        String to = "lxqaxx@163.com";
+        String subject = "邮件发送测试标题";
+        if (emailService.sendRemindEmail1(to, subject)) {
+            System.out.println("邮件发送成功！");
+        }else {
+            System.out.println("发送失败啦~~~");
+        }
     }
 }
