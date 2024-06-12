@@ -1,5 +1,4 @@
 package com.alivold.controller;
-
 import cn.hutool.json.JSONObject;
 import com.alivold.config.MinioConfig;
 import com.alivold.exception.BaseException;
@@ -7,9 +6,9 @@ import com.alivold.util.MinioUtil;
 import com.alivold.util.ResponseResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ public class CommonFileController {
     MinioUtil minioUtil;
 
     @PostMapping("/upload")
+    @PreAuthorize("hasAuthority('sys:pic')")
     public ResponseResult uploadFile(@RequestParam("files") List<MultipartFile> files){
         String bucketName = minioConfig.getBucketName();
         List<String> urls = new ArrayList<>();
@@ -44,6 +44,7 @@ public class CommonFileController {
     }
 
     @PostMapping("/download")
+    @PreAuthorize("hasAuthority('sys:pic')")
     public ResponseResult downloadFile(@RequestParam("fileName") String fileName, HttpServletResponse response){
         try {
             minioUtil.download(fileName, response);
