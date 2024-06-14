@@ -8,4 +8,6 @@ public interface LoginService {
     ResponseEntity<ResponseResult> login(SysUser sysUser);
 
     ResponseResult logout(String token);
+
+    ResponseResult getUserPermissions(String token);
 }

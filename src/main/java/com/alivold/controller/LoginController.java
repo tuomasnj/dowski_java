@@ -25,4 +25,10 @@ public class LoginController {
         String token = headers.get("token");
         return loginService.logout(token);
     }
+
+    @PostMapping("/permission")
+    public ResponseResult getPermissions(@RequestHeader Map<String, String> headers){
+        String token = headers.get("token");
+        return loginService.getUserPermissions(token);
+    }
 }

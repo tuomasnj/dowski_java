@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class LoginServiceImpl implements LoginService {
@@ -72,5 +74,13 @@ public class LoginServiceImpl implements LoginService {
         //删除redis中的用户信息
         redisCache.deleteObject(token);
         return ResponseResult.success();
+    }
+
+    @Override
+    public ResponseResult getUserPermissions(String token) {
+        log.info("用户token为【{}】", token);
+        LoginUser loginUser = loginUserInfoUtil.getLoginUser();
+        List<String> permissions = loginUser.getPermissions();
+        return ResponseResult.success(permissions);
     }
 }

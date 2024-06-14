@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 public class LoginUserInfoUtil {
     @Autowired
     private RedisCache redisCache;
-    private static final String LOGIN_KEY = "login_user";
 
     public String getLoginUserId(){
         UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken)
