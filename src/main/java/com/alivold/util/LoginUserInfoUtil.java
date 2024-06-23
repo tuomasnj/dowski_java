@@ -11,11 +11,11 @@ public class LoginUserInfoUtil {
     @Autowired
     private RedisCache redisCache;
 
-    public String getLoginUserId(){
+    public Long getLoginUserId(){
         UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken)
                 SecurityContextHolder.getContext().getAuthentication();
         LoginUser loginUser = (LoginUser) authenticationToken.getPrincipal();
-        String userId = loginUser.getUser().getId().toString();
+        Long userId = loginUser.getUser().getId();
         return userId;
     }
 

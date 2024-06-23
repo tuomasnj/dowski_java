@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alivold.dao.MemoMapper">
+    <select id="selectMemosByUserId" resultType="com.alivold.domain.SysMemo">
+        SELECT sm.user_id, sm.memo_date, sm.event_content, sm.status, sm.notify_time FROM sys_memo AS sm
+        <where>
+            <if test="month != null and month != ''">
+                AND DATE_FORMAT(memo_date, '%Y%m') = #{month}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND user_id = #{userId}
+            </if>
+        </where>
+        ORDER BY memo_date ASC
+    </select>
+</mapper>

@@ -1,5 +1,6 @@
 package com.alivold.config;
 
+import com.alivold.config.xss.XssFilter;
 import com.alivold.filter.CustomAccessDeniedHandler;
 import com.alivold.filter.CustomAuthenticationDeniedHandler;
 import com.alivold.filter.JwtAuthenticationTokenFilter;

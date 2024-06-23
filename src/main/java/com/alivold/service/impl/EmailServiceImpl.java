@@ -29,16 +29,16 @@ public class EmailServiceImpl implements EmailService {
         mailSender.send(mimeMessage);
     }
 
-    public boolean sendRemindEmail1(String to, String subject){
+    public boolean sendRemindEmail1(String to, String subject, String title, String eventContent){
         String htmlContent = "<html>"
                 + "<head><style>"
                 + "h1 {color: blue;}"
                 + "p {font-size: 14px; color: green;}"
                 + "</style></head>"
                 + "<body>"
-                + "<h1>事件标题</h1>"
+                + "<h1>" + title + "</h1>"
                 + "<p>备忘录事件提醒：</p >"
-                + "<p style='color: red;'>请别忘了今天的计划哟，您将要在今天12:00和dowski亲亲</p >"
+                + "<p style='color: red;'>" + eventContent + "</p >"
                 + "</body></html>";
         try {
             sendHtmlEmail(to, subject, htmlContent);

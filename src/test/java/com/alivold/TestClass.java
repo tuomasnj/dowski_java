@@ -89,7 +89,7 @@ public class TestClass {
     public void testBaseEmail(){
         String to = "lxqaxx@163.com";
         String subject = "邮件发送测试标题";
-        if (emailService.sendRemindEmail1(to, subject)) {
+        if (emailService.sendRemindEmail1(to, subject, "测试标题", "测试邮件正文内容")) {
             System.out.println("邮件发送成功！");
         }else {
             System.out.println("发送失败啦~~~");

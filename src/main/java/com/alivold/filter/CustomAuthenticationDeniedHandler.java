@@ -17,7 +17,7 @@ public class CustomAuthenticationDeniedHandler implements AuthenticationEntryPoi
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         PrintWriter out = response.getWriter();
-        ResponseResult respBean = ResponseResult.fail("认证失败，请重新登录!");
+        ResponseResult respBean = ResponseResult.fail(501, "认证失败，请重新登录!");
         out.write(new ObjectMapper().writeValueAsString(respBean));
         out.flush();
         out.close();

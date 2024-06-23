@@ -17,7 +17,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         PrintWriter out = response.getWriter();
-        ResponseResult respBean = ResponseResult.fail("您没有权限访问");
+        ResponseResult respBean = ResponseResult.fail(501, "您没有权限访问");
         out.write(new ObjectMapper().writeValueAsString(respBean));
         out.flush();
         out.close();

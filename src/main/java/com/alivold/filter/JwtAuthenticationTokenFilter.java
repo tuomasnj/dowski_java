@@ -24,7 +24,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Autowired
     private RedisCache redisCache;
 
-    private static final String LOGIN_KEY = "login_user";
+    //private static final String LOGIN_KEY = "login_user";
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         //获取token
@@ -49,7 +49,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             throw new BaseException("jwt已过期");
         }else{
             //刷新token时间
-            redisCache.expire(LOGIN_KEY + userId.toString(), 60* 60);
+            redisCache.expire(token, 60* 60);
         }
         //用户信息存入SecurityContextHolder
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities()));

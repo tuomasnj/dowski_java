@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class BusinessException extends  RuntimeException{
-    private Integer code = 501;
+    private Integer code = 201;
 
     public BusinessException(){
         super();
