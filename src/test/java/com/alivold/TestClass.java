@@ -3,8 +3,11 @@ package com.alivold;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alivold.config.MinioConfig;
+import com.alivold.dao.MemoMapper;
+import com.alivold.domain.SysMemo;
 import com.alivold.service.EmailService;
 import com.alivold.util.MinioUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.minio.MinioClient;
 import io.minio.messages.Bucket;
 import io.minio.messages.Item;
@@ -16,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +39,9 @@ public class TestClass {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private MemoMapper memoMapper;
 
     @Test
     public void test1(){
@@ -93,6 +100,27 @@ public class TestClass {
             System.out.println("邮件发送成功！");
         }else {
             System.out.println("发送失败啦~~~");
+        }
+    }
+
+    @Test
+    public void testCalendar(){
+        Calendar instance = Calendar.getInstance();
+        Date date = instance.getTime();
+        System.out.println(date);
+
+        LambdaQueryWrapper<SysMemo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.le(SysMemo::getNotifyTime, new Date());
+        wrapper.eq(SysMemo::getStatus, 0);
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        wrapper.eq(SysMemo::getMemoDate, today.getTime());
+        List<SysMemo> sysMemos = memoMapper.selectList(wrapper);
+        for(SysMemo s : sysMemos){
+            log.info(s.toString());
         }
     }
 }

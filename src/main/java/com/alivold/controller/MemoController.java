@@ -52,6 +52,7 @@ public class MemoController {
             calendar.set(Calendar.HOUR_OF_DAY, 9);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
             memo.setNotifyTime(calendar.getTime());
         }
         try {
@@ -73,6 +74,7 @@ public class MemoController {
             calendar.set(Calendar.HOUR_OF_DAY, 9);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
             memo.setNotifyTime(calendar.getTime());
         }
         LambdaQueryWrapper<SysMemo> sysMemoLambdaQueryWrapper = new LambdaQueryWrapper<>();
