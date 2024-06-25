@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.servlet.http.HttpServletResponse;
@@ -47,8 +48,11 @@ public class TestClass {
     @Autowired
     private LoginUserInfoUtil loginUserInfoUtil;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Test
-    public void test1(){
+    public void test1() {
         log.info("今天是【{}】", "周二");
         System.out.println(minioClient);
         System.out.println(StrUtil.isBlank("   "));
@@ -58,57 +62,57 @@ public class TestClass {
     }
 
     @Test
-    public void testDeleteMinio(){
+    public void testDeleteMinio() {
         System.out.println(minioUtil.removeBucket("xiaodowski"));
     }
 
     @Test
-    public void testGetAllBuckets(){
-        for(Bucket b: minioUtil.getAllBuckets()){
+    public void testGetAllBuckets() {
+        for (Bucket b : minioUtil.getAllBuckets()) {
             log.info("Bucket名称为==={}", b.name());
         }
     }
 
     @Test
-    public void testUtil(){
+    public void testUtil() {
         System.out.println(UUID.randomUUID().toString().replaceAll("-", ""));
         System.out.println(DateUtil.format(new Date(), "yyyy-MM/dd"));
     }
 
     @Test
-    public void testFileDelete(){
+    public void testFileDelete() {
         boolean ans = minioUtil.remove("2024-05/29/e82bdf2e0c734d9699b9d045a42305b7.pptx");
-        if(ans){
+        if (ans) {
             System.out.println("文件删除成功");
         }
     }
 
     @Test
-    public void testImgPreview(){
+    public void testImgPreview() {
         //获取图片访问地址需要使用全文件名换取url
         String previewUrl = minioUtil.preview("2024-05/29/f19a1a04c61742e790ab302e56d5b9f0.jpg");
         log.info("图片预览地址{}", previewUrl);
     }
 
     @Test
-    public void testBucketInfo(){
+    public void testBucketInfo() {
         List<Item> items = minioUtil.listObjects();
         System.out.println(items);
     }
 
     @Test
-    public void testBaseEmail(){
+    public void testBaseEmail() {
         String to = "lxqaxx@163.com";
         String subject = "邮件发送测试标题";
         if (emailService.sendRemindEmail1(to, subject, "测试标题", "测试邮件正文内容")) {
             System.out.println("邮件发送成功！");
-        }else {
+        } else {
             System.out.println("发送失败啦~~~");
         }
     }
 
     @Test
-    public void testCalendar(){
+    public void testCalendar() {
         Calendar instance = Calendar.getInstance();
         Date date = instance.getTime();
         System.out.println(date);
@@ -123,13 +127,21 @@ public class TestClass {
         today.set(Calendar.MILLISECOND, 0);
         wrapper.eq(SysMemo::getMemoDate, today.getTime());
         List<SysMemo> sysMemos = memoMapper.selectList(wrapper);
-        for(SysMemo s : sysMemos){
+        for (SysMemo s : sysMemos) {
             log.info(s.toString());
         }
     }
 
     @Test
-    public void testAuth(){
+    public void testAuth() {
         Long loginUserId = loginUserInfoUtil.getLoginUserId();
+    }
+
+    @Test
+    public void testPassword() {
+//        log.info(bCryptPasswordEncoder.encode("Suam3520"));
+//        log.info(bCryptPasswordEncoder.encode("lxqaxx"));
+        System.out.println(bCryptPasswordEncoder.encode("Suam3520"));
+        System.out.println(bCryptPasswordEncoder.encode("lxqaxx"));
     }
 }
