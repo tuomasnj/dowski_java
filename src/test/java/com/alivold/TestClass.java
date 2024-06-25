@@ -6,6 +6,7 @@ import com.alivold.config.MinioConfig;
 import com.alivold.dao.MemoMapper;
 import com.alivold.domain.SysMemo;
 import com.alivold.service.EmailService;
+import com.alivold.util.LoginUserInfoUtil;
 import com.alivold.util.MinioUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.minio.MinioClient;
@@ -42,6 +43,9 @@ public class TestClass {
 
     @Autowired
     private MemoMapper memoMapper;
+
+    @Autowired
+    private LoginUserInfoUtil loginUserInfoUtil;
 
     @Test
     public void test1(){
@@ -122,5 +126,10 @@ public class TestClass {
         for(SysMemo s : sysMemos){
             log.info(s.toString());
         }
+    }
+
+    @Test
+    public void testAuth(){
+        Long loginUserId = loginUserInfoUtil.getLoginUserId();
     }
 }

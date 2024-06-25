@@ -33,7 +33,7 @@ public class EmailServiceImpl implements EmailService {
         String htmlContent = "<html>"
                 + "<head><style>"
                 + "h1 {color: blue;}"
-                + "p {font-size: 14px; color: green;}"
+                + "p {font-size: 18px; color: green;}"
                 + "</style></head>"
                 + "<body>"
                 + "<h1>" + title + "</h1>"

@@ -20,7 +20,9 @@ public class LoginUserInfoUtil {
     }
 
     public LoginUser getLoginUser(){
-        LoginUser loginUser= (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken)
+                SecurityContextHolder.getContext().getAuthentication();
+        LoginUser loginUser= (LoginUser) authenticationToken.getPrincipal();
         return loginUser;
     }
 }
