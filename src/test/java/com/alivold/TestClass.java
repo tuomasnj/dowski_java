@@ -16,10 +16,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.webservices.client.WebServiceClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,6 +53,9 @@ public class TestClass {
 
     @Autowired
     private LoginUserInfoUtil loginUserInfoUtil;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -102,7 +111,8 @@ public class TestClass {
 
     @Test
     public void testBaseEmail() {
-        String to = "lxqaxx@163.com";
+        //String to = "lxqaxx@163.com";
+        String to = "1255407198@qq.com";
         String subject = "邮件发送测试标题";
         if (emailService.sendRemindEmail1(to, subject, "测试标题", "测试邮件正文内容")) {
             System.out.println("邮件发送成功！");
@@ -143,5 +153,38 @@ public class TestClass {
 //        log.info(bCryptPasswordEncoder.encode("lxqaxx"));
         System.out.println(bCryptPasswordEncoder.encode("Suam3520"));
         System.out.println(bCryptPasswordEncoder.encode("lxqaxx"));
+    }
+
+    @Test
+    public void testImgEmail() throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        String from = "1255407198@qq.com";
+        String to = "1255407198@qq.com";
+        String subject = "邮件主题";
+
+        String htmlContent = "<html>"
+                + "<body style='background-color: #f4f4f4;'>"
+                + "<div style='text-align: center;'>"
+                + "<img src='cid:backgroundImage' style='width: 100%; height: auto;' />"
+                + "<div style='position: absolute; top: 20px; left: 20px; color: white;'>"
+                + "<h1>这是带有背景图片的邮件</h1>"
+                + "<p>邮件内容...</p>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlContent, true);
+
+        // 添加内联背景图片
+        ClassPathResource resource = new ClassPathResource("/imgs/5268d877a2a04864b36b4961ab793f4f.jpg");
+        helper.addInline("backgroundImage", resource);
+
+        javaMailSender.send(message);
     }
 }

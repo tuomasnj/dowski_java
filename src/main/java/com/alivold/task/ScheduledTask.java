@@ -52,7 +52,7 @@ public class ScheduledTask {
         today.set(Calendar.MILLISECOND, 0);
         wrapper.eq(SysMemo::getMemoDate, today.getTime());
         List<SysMemo> sysMemos = memoMapper.selectList(wrapper);
-        for(SysMemo s : sysMemos){
+        for (SysMemo s : sysMemos) {
             s.setStatus(1);
             try {
                 LambdaQueryWrapper<SysMemo> memoWrapper = new LambdaQueryWrapper<>();
@@ -63,10 +63,10 @@ public class ScheduledTask {
                 SysUser sysUser = sysUserMapper.selectById(s.getUserId());
                 //发送邮件通知
                 emailService.sendRemindEmail1(sysUser.getEmail(), DateUtil.format(new Date(), "yyyy年M月d日") + "备忘事项提醒",
-                        DateUtil.format(new Date(), "yyyy年M月d日") + "待办", s.getEventContent());
-                log.info("通知了内容为【{}】的备忘事项",s.getEventContent());
+                        "【" + DateUtil.format(new Date(), "yyyy年M月d日") + "】" + "待办", s.getEventContent());
+                log.info("通知了内容为【{}】的备忘事项", s.getEventContent());
             } catch (Exception e) {
-                log.error("【{}】",e.getMessage());
+                log.error("【{}】", e.getMessage());
                 throw new BusinessException("发送邮件通知异常");
             }
         }

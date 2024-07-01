@@ -3,6 +3,7 @@ package com.alivold.service.impl;
 import com.alivold.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,13 @@ public class EmailServiceImpl implements EmailService {
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);
+        // 添加内联背景图片
+        ClassPathResource resource = new ClassPathResource("/imgs/20220728222044_532d1.jpeg");
+        helper.addInline("backgroundImage", resource);
         mailSender.send(mimeMessage);
     }
 
-    public boolean sendRemindEmail1(String to, String subject, String title, String eventContent){
+    public boolean sendRemindEmail1(String to, String subject, String title, String eventContent) {
         String htmlContent = "<html>"
                 + "<head><style>"
                 + "h1 {color: blue;}"
@@ -39,6 +43,9 @@ public class EmailServiceImpl implements EmailService {
                 + "<h1>" + title + "</h1>"
                 + "<p>备忘录事件提醒：</p >"
                 + "<p style='color: red;'>" + eventContent + "</p >"
+                + "<div style=\"text-align: right;\">"
+                + "<img src='cid:backgroundImage' style='width: 30%; height: 30%' />"
+                + "</div>"
                 + "</body></html>";
         try {
             sendHtmlEmail(to, subject, htmlContent);
