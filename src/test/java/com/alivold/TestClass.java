@@ -111,8 +111,8 @@ public class TestClass {
 
     @Test
     public void testBaseEmail() {
-        //String to = "lxqaxx@163.com";
-        String to = "1255407198@qq.com";
+        String to = "lxqaxx@163.com";
+        //String to = "1255407198@qq.com";
         String subject = "邮件发送测试标题";
         if (emailService.sendRemindEmail1(to, subject, "测试标题", "测试邮件正文内容")) {
             System.out.println("邮件发送成功！");
