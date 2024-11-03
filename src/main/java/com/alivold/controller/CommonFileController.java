@@ -1,7 +1,11 @@
 package com.alivold.controller;
 import cn.hutool.json.JSONObject;
 import com.alivold.config.MinioConfig;
+import com.alivold.domain.CommonFile;
+import com.alivold.domain.PhotoImage;
 import com.alivold.exception.BaseException;
+import com.alivold.service.CommonFileService;
+import com.alivold.util.LoginUserInfoUtil;
 import com.alivold.util.MinioUtil;
 import com.alivold.util.ResponseResult;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/file")
@@ -23,24 +31,36 @@ public class CommonFileController {
     @Autowired
     MinioUtil minioUtil;
 
+    @Autowired
+    CommonFileService commonFileService;
+
+    @Autowired
+    LoginUserInfoUtil loginUserInfoUtil;
+
     @PostMapping("/upload")
     @PreAuthorize("hasAuthority('sys:pic')")
     public ResponseResult uploadFile(@RequestParam("files") List<MultipartFile> files){
-        String bucketName = minioConfig.getBucketName();
-        List<String> urls = new ArrayList<>();
-        JSONObject jsonObject = new JSONObject();
-        for(MultipartFile file: files){
-            String originalFileName =file.getOriginalFilename();
-            log.info("上传文件的名称为【{}】", originalFileName);
-            String objectName = minioUtil.upload(file);
-            if(objectName == null){
-                throw new BaseException("文件上传失败");
-            }
-            urls.add(minioConfig.getEndpoint() + bucketName + '/' + objectName);
+        Long userId = loginUserInfoUtil.getLoginUserId();
+        try {
+            //创建一组异步任务
+            List<CompletableFuture<CommonFile>> futures = files.stream()
+                    .map(file -> commonFileService.uploadFile(file, userId))
+                    .collect(Collectors.toList());
+
+            // 等待所有异步任务完成
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+            //获取任务执行结果
+            CompletableFuture<List<CommonFile>> tasks = allOf.thenApply(v ->
+                    futures.stream()
+                            .map(CompletableFuture::join)
+                            .collect(Collectors.toList())
+            );
+            List<CommonFile> res = tasks.get();
+            return ResponseResult.success(res);
+        } catch (Exception e) {
+            throw new BaseException("服务异常");
         }
-        // TODO: 2024/5/29 存储文件信息至数据库
-        jsonObject.set("urls", urls);
-        return ResponseResult.success(jsonObject);
     }
 
     @PostMapping("/download")
@@ -53,5 +73,13 @@ public class CommonFileController {
             throw new BaseException("文件下载错误！");
         }
         return ResponseResult.success();
+    }
+
+    @PostMapping("/ImgInfo")
+    @PreAuthorize("hasAuthority('sys:pic')")
+    public ResponseResult getImgInfo(){
+        Long loginUserId = loginUserInfoUtil.getLoginUserId();
+        List<PhotoImage> res = commonFileService.getImgInfo(loginUserId);
+        return ResponseResult.success(res);
     }
 }

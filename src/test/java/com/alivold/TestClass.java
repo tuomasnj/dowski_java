@@ -27,10 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -186,5 +183,11 @@ public class TestClass {
         helper.addInline("backgroundImage", resource);
 
         javaMailSender.send(message);
+    }
+
+    @Test
+    public void testSplit(){
+        String ss = "123/5698//51/kkl/aacn";
+        System.out.println(Arrays.asList(ss.split("/")));
     }
 }
