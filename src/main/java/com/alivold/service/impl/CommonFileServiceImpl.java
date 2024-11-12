@@ -1,16 +1,16 @@
 package com.alivold.service.impl;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.json.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.alivold.config.MinioConfig;
 import com.alivold.dao.ImgMapper;
 import com.alivold.domain.CommonFile;
 import com.alivold.domain.PhotoImage;
 import com.alivold.exception.BaseException;
 import com.alivold.service.CommonFileService;
-import com.alivold.util.LoginUserInfoUtil;
 import com.alivold.util.MinioUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
-public class CommonFileServiceImpl implements CommonFileService {
+public class CommonFileServiceImpl extends ServiceImpl<ImgMapper, PhotoImage> implements CommonFileService {
     @Autowired
     MinioConfig minioConfig;
 
@@ -66,17 +66,19 @@ public class CommonFileServiceImpl implements CommonFileService {
     }
 
     @Override
-    public List<PhotoImage> getImgInfo(Long loginUserId) {
+    public Page<PhotoImage> getImgInfo(Long loginUserId, Integer current, Integer size) {
+
         LambdaQueryWrapper<PhotoImage> photoImageLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        Page<PhotoImage> page = new Page<>(current, size);
         if(loginUserId == null){
             return null;
         }else if(loginUserId == 1L  || loginUserId == 2L){
             photoImageLambdaQueryWrapper.in(PhotoImage::getUserId, Arrays.asList(new Long[]{1L, 2L}));
-            List<PhotoImage> photoImages = imageMapper.selectList(photoImageLambdaQueryWrapper);
+            Page<PhotoImage> photoImages = this.page(page, photoImageLambdaQueryWrapper);
             return photoImages;
         }else{
             photoImageLambdaQueryWrapper.eq(PhotoImage::getUserId, loginUserId);
-            List<PhotoImage> photoImages = imageMapper.selectList(photoImageLambdaQueryWrapper);
+            Page<PhotoImage> photoImages = this.page(page, photoImageLambdaQueryWrapper);
             return photoImages;
         }
     }

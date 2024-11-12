@@ -2,12 +2,14 @@ package com.alivold.controller;
 import cn.hutool.json.JSONObject;
 import com.alivold.config.MinioConfig;
 import com.alivold.domain.CommonFile;
+import com.alivold.domain.PageResult;
 import com.alivold.domain.PhotoImage;
 import com.alivold.exception.BaseException;
 import com.alivold.service.CommonFileService;
 import com.alivold.util.LoginUserInfoUtil;
 import com.alivold.util.MinioUtil;
 import com.alivold.util.ResponseResult;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -77,9 +79,20 @@ public class CommonFileController {
 
     @PostMapping("/ImgInfo")
     @PreAuthorize("hasAuthority('sys:pic')")
-    public ResponseResult getImgInfo(){
+    public ResponseResult getImgInfo(@RequestBody JSONObject jsonObject){
+        Integer current = Integer.parseInt(jsonObject.getStr("current"));
+        Integer size = Integer.parseInt(jsonObject.getStr("size"));
         Long loginUserId = loginUserInfoUtil.getLoginUserId();
-        List<PhotoImage> res = commonFileService.getImgInfo(loginUserId);
+        Page<PhotoImage> pageRes = commonFileService.getImgInfo(loginUserId, current, size);
+        PageResult<PhotoImage> res = new PageResult<>(pageRes);
         return ResponseResult.success(res);
+    }
+
+    @PostMapping("delete")
+    @PreAuthorize("hasAuthority('sys:pic')")
+    public ResponseResult deleteImg(@RequestBody JSONObject jsonObject){
+        String fileName = jsonObject.getStr("fileName");
+        boolean remove = minioUtil.remove(fileName);
+        return remove? ResponseResult.success(): ResponseResult.fail();
     }
 }
