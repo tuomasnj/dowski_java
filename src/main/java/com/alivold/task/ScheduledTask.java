@@ -95,9 +95,8 @@ public class ScheduledTask {
     /**
      * 每天晚上11点记录当天的天气预报信息
      */
-//    @Scheduled(cron = "0 23 * * *")
     @Transactional
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 0 23 * * ?")
     public void markTodayTemperature(){
         try {
             String url = "https://www.mxnzp.com/api/weather/forecast/南京市";
