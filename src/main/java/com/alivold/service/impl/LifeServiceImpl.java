@@ -84,8 +84,10 @@ public class LifeServiceImpl implements LifeService {
 
     @Override
     @Async(value = "taskExecutor")
-    public CompletableFuture<Integer> queryCurTemp(CountDownLatch countDownLatch) {
+    public CompletableFuture<JSONObject> queryCurTemp(CountDownLatch countDownLatch) {
         String curTemp = "";
+        String curWeather = "";
+        JSONObject res = new JSONObject();
         try {
             //QPS有限制,每秒钟一次，这里间隔设置为2.5秒
             Thread.sleep(2000);
@@ -96,6 +98,9 @@ public class LifeServiceImpl implements LifeService {
             if(resObj != null && resObj.getStr("code").equals("1")){
                 JSONObject data = resObj.getJSONObject("data");
                 curTemp = data.getStr("temp").substring(0, data.getStr("temp").length() - 1);
+                curWeather = data.getStr("weather");
+                res.set("curTemp", curTemp);
+                res.set("curWeather", curWeather);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,6 +108,6 @@ public class LifeServiceImpl implements LifeService {
         }finally {
             countDownLatch.countDown();
         }
-        return CompletableFuture.completedFuture(Integer.parseInt(curTemp));
+        return CompletableFuture.completedFuture(res);
     }
 }

@@ -33,10 +33,10 @@ public class LifeServiceController {
             JSONObject resObject = new JSONObject();
             CountDownLatch countDownLatch = new CountDownLatch(2); //使用countDownlatch进行异步任务控制，每一个任务完成以后latch就减1。所有任务完成以后返回结果
             CompletableFuture<List<SysWeather>> future1 =  lifeService.queryTempForecastLists(countDownLatch);
-            CompletableFuture<Integer> future2 = lifeService.queryCurTemp(countDownLatch);
+            CompletableFuture<JSONObject> future2 = lifeService.queryCurTemp(countDownLatch);
             countDownLatch.await();
             resObject.set("list", future1.get());
-            resObject.set("curTemp", future2.get());
+            resObject.set("curData", future2.get());
             return ResponseResult.success(resObject);
         } catch (Exception e) {
             e.printStackTrace();
