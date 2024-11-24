@@ -1,4 +1,6 @@
 package com.alivold.controller;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import com.alivold.config.MinioConfig;
 import com.alivold.domain.CommonFile;
@@ -12,6 +14,7 @@ import com.alivold.util.ResponseResult;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,11 +93,15 @@ public class CommonFileController {
         return ResponseResult.success(res);
     }
 
-    @PostMapping("delete")
+    @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:pic')")
     public ResponseResult deleteImg(@RequestBody JSONObject jsonObject){
         String fileName = jsonObject.getStr("fileName");
-        boolean remove = minioUtil.remove(fileName);
-        return remove? ResponseResult.success(): ResponseResult.fail();
+        PhotoImage img = commonFileService.selectImg(fileName);
+        if(img == null || ObjectUtil.isEmpty(img)){
+            return ResponseResult.fail("删除的图片不存在！");
+        }
+        boolean result = commonFileService.deleteItem(img.getImageUrl(), fileName);
+        return result? ResponseResult.success(): ResponseResult.fail("服务异常");
     }
 }

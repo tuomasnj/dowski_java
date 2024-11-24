@@ -135,6 +135,5 @@ public class ScheduledTask {
             log.error(e.getMessage());
             throw new BusinessException("更新当日天气数据失败");
         }
-
     }
 }

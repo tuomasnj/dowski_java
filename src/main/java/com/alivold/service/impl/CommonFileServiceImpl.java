@@ -1,6 +1,7 @@
 package com.alivold.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.alivold.exception.BusinessException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.alivold.config.MinioConfig;
 import com.alivold.dao.ImgMapper;
@@ -13,6 +14,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -32,6 +36,9 @@ public class CommonFileServiceImpl extends ServiceImpl<ImgMapper, PhotoImage> im
 
     @Autowired
     ImgMapper imageMapper;
+
+    @Value("${minio.bucketName}")
+    String bucketName;
 
     @Override
     @Async("taskExecutor")
@@ -67,8 +74,8 @@ public class CommonFileServiceImpl extends ServiceImpl<ImgMapper, PhotoImage> im
 
     @Override
     public Page<PhotoImage> getImgInfo(Long loginUserId, Integer current, Integer size) {
-
         LambdaQueryWrapper<PhotoImage> photoImageLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        photoImageLambdaQueryWrapper.orderByDesc(PhotoImage::getCreatedTime);
         Page<PhotoImage> page = new Page<>(current, size);
         if(loginUserId == null){
             return null;
@@ -80,6 +87,39 @@ public class CommonFileServiceImpl extends ServiceImpl<ImgMapper, PhotoImage> im
             photoImageLambdaQueryWrapper.eq(PhotoImage::getUserId, loginUserId);
             Page<PhotoImage> photoImages = this.page(page, photoImageLambdaQueryWrapper);
             return photoImages;
+        }
+    }
+
+    @Override
+    public PhotoImage selectImg(String fileName) {
+        LambdaQueryWrapper<PhotoImage> photoImageLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        photoImageLambdaQueryWrapper.eq(PhotoImage::getImageName, fileName);
+        PhotoImage image = imageMapper.selectOne(photoImageLambdaQueryWrapper);
+        return image;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteItem(String imageUrl, String fileName) {
+        try {
+            //根据fileName删除数据库记录
+            LambdaQueryWrapper<PhotoImage> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(PhotoImage::getImageName, fileName);
+            int delete = imageMapper.delete(queryWrapper);
+            if(delete == 0){
+                throw new BaseException("图片删除失败");
+            }
+            //根据url和bucketName找到remove方法的文件名参数
+            String str = bucketName + "/";
+            int idx = imageUrl.indexOf(str);
+            String target = imageUrl.substring(idx + str.length());
+            //2024-11/03/8b735ea834004bf8b4b4fa816a27352a.jpg
+            log.info("文件名：【{}】",target);
+            boolean remove = minioUtil.remove(target);
+            return remove;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BaseException("服务异常");
         }
     }
 }

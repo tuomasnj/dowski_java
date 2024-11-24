@@ -12,4 +12,8 @@ public interface CommonFileService {
     CompletableFuture<CommonFile> uploadFile(MultipartFile file, Long userId);
 
     Page<PhotoImage> getImgInfo(Long loginUserId, Integer current, Integer size);
+
+    PhotoImage selectImg(String fileName);
+
+    boolean deleteItem(String imageUrl, String fileName);
 }
