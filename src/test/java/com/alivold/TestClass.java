@@ -2,10 +2,13 @@ package com.alivold;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alivold.config.MinioConfig;
 import com.alivold.dao.MemoMapper;
+import com.alivold.domain.PhotoImage;
 import com.alivold.domain.SysMemo;
 import com.alivold.service.EmailService;
+import com.alivold.service.impl.RedisQueueService;
 import com.alivold.util.LoginUserInfoUtil;
 import com.alivold.util.MinioUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -56,6 +59,9 @@ public class TestClass {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private RedisQueueService queueService;
 
     @Test
     public void test1() {
@@ -189,5 +195,22 @@ public class TestClass {
     public void testSplit(){
         String ss = "123/5698//51/kkl/aacn";
         System.out.println(Arrays.asList(ss.split("/")));
+    }
+
+    @Test
+    public void send(){
+        for (int i = 0; i < 500; i++) {
+            PhotoImage photoImage = new PhotoImage();
+            photoImage.setUserId(Long.parseLong(String.valueOf(i)));
+            queueService.sendMessageToQueue("test:dowski",JSONUtil.toJsonStr(photoImage));
+            log.info("发送成功【{}】", i);
+        }
+    }
+
+    @Test
+    public void receive(){
+        for (int i = 0; i < 5; i++) { // 启动5个消费者线程
+            new Thread(queueService::getBatch).start();
+        }
     }
 }
